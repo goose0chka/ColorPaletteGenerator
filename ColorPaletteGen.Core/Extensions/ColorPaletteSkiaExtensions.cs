@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace ColorPaletteGen.Core;
+namespace ColorPaletteGen.Core.Extensions;
 
 public static class ColorPaletteSkiaExtensions
 {

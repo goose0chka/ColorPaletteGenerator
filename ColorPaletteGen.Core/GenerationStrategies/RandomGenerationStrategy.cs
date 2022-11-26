@@ -2,15 +2,15 @@
 
 public class RandomGenerationStrategy : IGenerationStrategy
 {
-    private static readonly Random Rand = new();
+    private static readonly Random Rand = Random.Shared;
+    private static readonly byte[] ByteBuffer = new byte[3];
     public List<Color> Generate(int count)
     {
         List <Color> colors = new(count);
-        var bytes = new byte[3];
         for (var i = 0; i < 5; i++)
         {
-            Rand.NextBytes(bytes);
-            colors.Add(Color.FromRGB(bytes));
+            Rand.NextBytes(ByteBuffer);
+            colors.Add(Color.FromRGB(ByteBuffer));
         }
 
         return colors;

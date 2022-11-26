@@ -26,4 +26,7 @@ public readonly struct Color
         
         return new Color(bytes[0], bytes[1], bytes[2]);
     }
+
+    public override string ToString()
+        => Hex;
 }

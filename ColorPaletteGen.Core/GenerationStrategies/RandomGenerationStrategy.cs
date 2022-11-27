@@ -8,8 +8,14 @@ public class RandomGenerationStrategy : IGenerationStrategy
     {
         for (var i = 0; i < colors.Length; i++)
         {
-            Rand.NextBytes(ByteBuffer);
-            colors[i] = Color.FromRGB(ByteBuffer);
+            colors[i] = GetRandomColor();
         }
     }
+
+    public static Color GetRandomColor()
+    {
+        Rand.NextBytes(ByteBuffer);
+        return Color.FromRGB(ByteBuffer);
+    }
 }
+

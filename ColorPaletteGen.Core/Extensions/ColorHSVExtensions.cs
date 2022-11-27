@@ -3,45 +3,66 @@
 public static class ColorHSVExtensions
 {
     private const double Tolerance = 0.01;
+
     private static double Normalize(byte value)
-        => value / 255.0; 
+        => value / 255.0;
+
+    private readonly struct RGBToHSVData
+    {
+        public readonly double R;
+        public readonly double G;
+        public readonly double B;
+        public double Max => Math.Max(R, Math.Max(G, B));
+        public double Min => Math.Min(R, Math.Min(G, B));
+        public double Diff => Max - Min;
+
+        public RGBToHSVData(Color color)
+        {
+            R = Normalize(color.Red);
+            G = Normalize(color.Green);
+            B = Normalize(color.Blue);
+        }
+    }
+    
     public static int GetHue(this Color color)
     {
-        var r = Normalize(color.Red);
-        var g = Normalize(color.Green);
-        var b = Normalize(color.Blue);
-        
-        // RGB to HSV
-        var max = Math.Max(r, Math.Max(g, b));
-        var min = Math.Min(r, Math.Min(g, b));
-        var diff = max - min;
+        var data = new RGBToHSVData(color);
 
-        if (diff == 0)
+        if (data.Diff == 0)
         {
             return 0;
         }
         
-        if (Math.Abs(max - r) < Tolerance)
+        if (Math.Abs(data.Max - data.R) < Tolerance)
         {
-            return (int)Math.Truncate(60 * ((g - b) / diff % 6));
+            return (int)Math.Truncate(60 * ((data.G - data.B) / data.Diff % 6));
         }
 
-        if (Math.Abs(max - g) < Tolerance)
+        if (Math.Abs(data.Max - data.G) < Tolerance)
         {
-            return (int)Math.Truncate(60 * ((b - r) / diff + 2));
+            return (int)Math.Truncate(60 * ((data.B - data.R) / data.Diff + 2));
         }
 
-        if (Math.Abs(max - b) < Tolerance)
+        if (Math.Abs(data.Max - data.B) < Tolerance)
         {
-            return (int)Math.Truncate(60 * ((r - g) / diff + 4));
+            return (int)Math.Truncate(60 * ((data.R - data.G) / data.Diff + 4));
         }
 
         throw new Exception();
     }
 
+    public static int GetSaturation(this Color color)
+    {
+        var data = new RGBToHSVData(color);
+        return data.Max == 0 ? 0 : Convert.ToInt32(data.Max / data.Diff * 100);
+    }
+
+    public static int GetValue(this Color color)
+        => Convert.ToInt32(new RGBToHSVData(color).Max * 100);
+    
     public static Color FromHSV(int hue, int saturation, int value)
     {
-        var h = Math.Abs(hue % 360);
+        var h = hue > 0 ? hue % 360 : 360 - Math.Abs(hue % 360);
         var s = Math.Clamp(saturation, 0, 100) / 100.0;
         var v = Math.Clamp(value, 0, 100) / 100.0;
         
@@ -86,9 +107,9 @@ public static class ColorHSVExtensions
                 break;
         }
 
-        var r = (byte)(Math.Round((rN + m) * 255) % 256);
-        var g = (byte)(Math.Round((gN + m) * 255) % 256);
-        var b = (byte)(Math.Round((bN + m) * 255) % 256);
+        var r = Convert.ToByte(Math.Round((rN + m) * 255) % 256);
+        var g = Convert.ToByte(Math.Round((gN + m) * 255) % 256);
+        var b = Convert.ToByte(Math.Round((bN + m) * 255) % 256);
         
         return Color.FromRGB(r, g, b);
     }

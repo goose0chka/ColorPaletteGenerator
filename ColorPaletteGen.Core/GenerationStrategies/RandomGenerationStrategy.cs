@@ -18,4 +18,3 @@ public class RandomGenerationStrategy : IGenerationStrategy
         return Color.FromRGB(ByteBuffer);
     }
 }
-

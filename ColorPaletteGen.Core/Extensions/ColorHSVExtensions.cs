@@ -62,7 +62,7 @@ public static class ColorHSVExtensions
     
     public static Color FromHSV(int hue, int saturation, int value)
     {
-        var h = hue > 0 ? hue % 360 : 360 - Math.Abs(hue % 360);
+        var h = hue >= 0 ? hue % 360 : 360 - Math.Abs(hue % 360);
         var s = Math.Clamp(saturation, 0, 100) / 100.0;
         var v = Math.Clamp(value, 0, 100) / 100.0;
         

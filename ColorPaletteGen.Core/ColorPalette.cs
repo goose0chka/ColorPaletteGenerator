@@ -5,7 +5,7 @@ namespace ColorPaletteGen.Core;
 
 public class ColorPalette
 {
-    private Color[] _colors;
+    private readonly Color[] _colors;
     private IGenerationStrategy _strategy;
     public ReadOnlyCollection<Color> Colors => Array.AsReadOnly(_colors);
     public int ColorCount => _colors.Length;

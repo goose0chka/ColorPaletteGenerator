@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace ColorPaletteGen.Core;
+namespace ColorPaletteGen.Core.Extensions;
 
 public static class ColorPaletteSkiaExtensions
 {
@@ -21,15 +21,16 @@ public static class ColorPaletteSkiaExtensions
         
         if (Path.GetExtension(file) != "png")
         {
-            throw new ArgumentException("File must have png extension");
+            if (Path.HasExtension(file))
+            {
+                throw new ArgumentException("File must have png extension");
+            }
+
+            directory = Path.Join(directory, file);
+            file = Path.ChangeExtension(Path.GetRandomFileName(), "png");
         }
 
         Directory.CreateDirectory(directory);
-        if (!Path.HasExtension(file))
-        {
-            file = Path.ChangeExtension(path, "png");
-        }
-
         return Path.Combine(directory, file);
     }
 

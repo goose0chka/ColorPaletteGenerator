@@ -2,5 +2,5 @@
 
 public interface IGenerationStrategy
 {
-    public abstract List<Color> Generate(int count);
+    public void Generate(Color[] colors);
 }

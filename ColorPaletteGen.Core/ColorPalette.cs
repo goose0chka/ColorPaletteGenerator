@@ -5,10 +5,10 @@ namespace ColorPaletteGen.Core;
 
 public class ColorPalette
 {
-    private List<Color> _colors;
+    private readonly Color[] _colors;
     private IGenerationStrategy _strategy;
-    public ReadOnlyCollection<Color> Colors => _colors.AsReadOnly();
-    public int ColorCount => _colors.Capacity;
+    public ReadOnlyCollection<Color> Colors => Array.AsReadOnly(_colors);
+    public int ColorCount => _colors.Length;
     public ColorPalette(int colorCount = 5)
         : this(new RandomGenerationStrategy(), colorCount)
     {
@@ -21,7 +21,7 @@ public class ColorPalette
             throw new InvalidOperationException();
         }
 
-        _colors = new List<Color>(colorCount);
+        _colors = new Color[colorCount];
         _strategy = strategy;
         Generate();
     }
@@ -31,7 +31,7 @@ public class ColorPalette
 
     public void Generate()
     {
-        _colors = _strategy.Generate(ColorCount);
+        _strategy.Generate(_colors);
     }
 
     public Color this[int index]

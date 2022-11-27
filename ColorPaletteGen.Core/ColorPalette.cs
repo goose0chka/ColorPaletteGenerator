@@ -31,7 +31,7 @@ public class ColorPalette
 
     public void Generate()
     {
-        _colors = _strategy.Generate(ColorCount);
+        _strategy.Generate(_colors);
     }
 
     public Color this[int index]

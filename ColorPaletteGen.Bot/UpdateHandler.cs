@@ -13,10 +13,9 @@ namespace ColorPaletteGen.Bot;
 public class UpdateHandler : IUpdateHandler
 {
     private static readonly InlineKeyboardMarkup Markup =
-        new(InlineKeyboardButton.WithCallbackData("Refresh"));
+        new(InlineKeyboardButton.WithCallbackData("🔁", "refresh"));
 
     private readonly ILogger<UpdateHandler> _logger;
-    private readonly Dictionary<ChatId, int> _messageIds = new();
 
     public UpdateHandler(ILogger<UpdateHandler> logger)
     {
@@ -29,42 +28,60 @@ public class UpdateHandler : IUpdateHandler
         return update.Type switch
         {
             UpdateType.Message => HandleMessage(botClient, update.Message!, cancellationToken),
+            UpdateType.CallbackQuery => HandleCallbackQuery(botClient, update.CallbackQuery!, cancellationToken),
+            _ => Task.CompletedTask
+        };
+    }
+    
+    private static Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery, CancellationToken cancellationToken)
+    {
+        return callbackQuery.Data switch
+        {
+            "refresh" => HandleRefreshCallback(botClient, callbackQuery, cancellationToken),
             _ => Task.CompletedTask
         };
     }
 
-    private async Task HandleMessage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    private static Task HandleMessage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
-        if (message?.EntityValues?.ElementAtOrDefault(0) == "/generate")
+        return message.Text switch
         {
-            var chatId = message.Chat.Id;
-            var palette = new ColorPalette();
-            await using var stream = palette.GetImageStream(500, 200);
-            Message newMessage;
-            if (_messageIds.ContainsKey(chatId))
-            {
-                var messageId = _messageIds[chatId];
-                var @base = new InputMedia(stream, "palette");
-                var media = new InputMediaPhoto(@base);
-                newMessage = await botClient.EditMessageMediaAsync(
-                    chatId, messageId, media,
-                    replyMarkup: Markup,
-                    cancellationToken: cancellationToken);
-            }
-            else
-            {
-                var media = new InputOnlineFile(stream);
-                newMessage = await botClient.SendPhotoAsync(
-                    message.Chat.Id, media,
-                    replyMarkup: Markup,
-                    cancellationToken: cancellationToken);
-            }
-
-            _messageIds[message.Chat.Id] = newMessage.MessageId;
-            await botClient.DeleteMessageAsync(chatId, message.MessageId, cancellationToken: cancellationToken);
-        }
+            "/generate" => GenerateColorPalette(botClient, message, cancellationToken),
+            _ => Task.CompletedTask
+        };
     }
 
+    private static async Task GenerateColorPalette(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        var chatId = message.Chat.Id;
+        var palette = new ColorPalette();
+        await using var stream = palette.GetImageStream(1000, 400);
+        var media = new InputOnlineFile(stream);
+        await botClient.SendPhotoAsync(
+            message.Chat.Id, media,
+            replyMarkup: Markup,
+            cancellationToken: cancellationToken);
+        await botClient.DeleteMessageAsync(chatId, message.MessageId, cancellationToken: cancellationToken);
+    }
+
+    private static async Task HandleRefreshCallback(ITelegramBotClient botClient, CallbackQuery callbackQuery,
+        CancellationToken cancellationToken)
+    {
+        var chatId = callbackQuery.Message!.Chat.Id;
+        var messageId = callbackQuery.Message.MessageId;
+        
+        var palette = new ColorPalette();
+        await using var stream = palette.GetImageStream(1000, 400);
+        
+        var @base = new InputMedia(stream, "palette");
+        var media = new InputMediaPhoto(@base);
+        
+        await botClient.EditMessageMediaAsync(
+            chatId, messageId, media,
+            replyMarkup: Markup,
+            cancellationToken: cancellationToken);
+    }
+    
     public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
         CancellationToken cancellationToken)
     {

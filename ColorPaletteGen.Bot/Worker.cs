@@ -1,20 +1,22 @@
+using Telegram.Bot;
+using Telegram.Bot.Polling;
+
 namespace ColorPaletteGen.Bot;
 
 public class Worker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
+    private readonly ITelegramBotClient _client;
+    private readonly IUpdateHandler _handler;
 
-    public Worker(ILogger<Worker> logger)
+    public Worker(ITelegramBotClient client, IUpdateHandler handler)
     {
-        _logger = logger;
+        _client = client;
+        _handler = handler;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            await Task.Delay(1000, stoppingToken);
-        }
+        _client.StartReceiving(_handler, null, stoppingToken);
+        return Task.CompletedTask;
     }
 }

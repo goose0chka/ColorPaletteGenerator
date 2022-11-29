@@ -1,21 +1,21 @@
-﻿using ColorPaletteGen.Core.Extensions;
+﻿using ColorPaletteGen.Core.Color;
+using ColorPaletteGen.Core.Extensions;
 
 namespace ColorPaletteGen.Core.GenerationStrategies;
 
 public class AnalogousGenerationStrategy : IGenerationStrategy
 {
     private readonly int _distance;
-    private readonly Color _baseColor;
+    private readonly BaseColor _baseColor;
 
-    public AnalogousGenerationStrategy(Color baseColor, int distance = 15)
+    public AnalogousGenerationStrategy(BaseColor baseColor, int distance = 15)
     {
         _baseColor = baseColor;
         _distance = distance;
     }
 
-    public void Generate(Color[] colors)
+    public void Generate(PaletteColor[] colors)
     {
-        // throw new NotImplementedException();
         if (colors.Length % 2 != 1)
         {
             throw new InvalidOperationException("Analogous palette should have uneven color count");
@@ -29,7 +29,7 @@ public class AnalogousGenerationStrategy : IGenerationStrategy
         {
             var newHue = hue + _distance * (i - sideCount);
             var color = ColorHSVExtensions.FromHSV(newHue, sat, val);
-            colors[i] = color;
+            colors[i] = new PaletteColor(color);
         }
     }
 }

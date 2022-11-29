@@ -1,14 +1,21 @@
 ﻿using System.Collections.ObjectModel;
+using ColorPaletteGen.Core.Color;
 using ColorPaletteGen.Core.GenerationStrategies;
 
 namespace ColorPaletteGen.Core;
 
 public class ColorPalette
 {
-    private readonly Color[] _colors;
+    private readonly PaletteColor[] _colors;
     private IGenerationStrategy _strategy;
-    public ReadOnlyCollection<Color> Colors => Array.AsReadOnly(_colors);
+
+    public ReadOnlyCollection<BaseColor> Colors => _colors
+        .Cast<BaseColor>()
+        .ToList()
+        .AsReadOnly();
+
     public int ColorCount => _colors.Length;
+
     public ColorPalette(int colorCount = 5)
         : this(new RandomGenerationStrategy(), colorCount)
     {
@@ -21,7 +28,7 @@ public class ColorPalette
             throw new InvalidOperationException();
         }
 
-        _colors = new Color[colorCount];
+        _colors = new PaletteColor[colorCount];
         _strategy = strategy;
         Generate();
     }
@@ -34,6 +41,6 @@ public class ColorPalette
         _strategy.Generate(_colors);
     }
 
-    public Color this[int index]
+    public BaseColor this[int index]
         => _colors[index];
 }

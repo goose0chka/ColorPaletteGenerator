@@ -2,15 +2,13 @@
 using ColorPaletteGen.Core;
 using ColorPaletteGen.Core.Extensions;
 using Telegram.Bot;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace ColorPaletteGen.Bot;
+namespace ColorPaletteGen.Bot.Handlers;
 
-public class UpdateHandler : IUpdateHandler
+public class UpdateHandler
 {
     private readonly ColorPaletteGenerator _generator;
     private readonly ILogger<UpdateHandler> _logger;
@@ -22,38 +20,14 @@ public class UpdateHandler : IUpdateHandler
         _generator = generator;
     }
 
-    public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
-        CancellationToken cancellationToken)
-    {
-        return update.Type switch
-        {
-            UpdateType.Message => HandleMessage(botClient, update.Message!, cancellationToken),
-            UpdateType.CallbackQuery => HandleCallbackQuery(botClient, update.CallbackQuery!, cancellationToken),
-            _ => Task.CompletedTask
-        };
-    }
-
-    public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
-        CancellationToken cancellationToken)
+    public Task HandlePollingErrorAsync(Exception exception)
     {
         var time = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
         _logger.LogError(exception, "{Time}: ", time);
         return Task.CompletedTask;
     }
 
-    private Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery,
-        CancellationToken cancellationToken)
-    {
-        return callbackQuery.Data switch
-        {
-            "refresh" => HandleRefreshCallback(botClient, callbackQuery, cancellationToken),
-            _ => callbackQuery.Data!.Contains("lock")
-                ? HandleColorLock(botClient, callbackQuery, cancellationToken)
-                : Task.CompletedTask
-        };
-    }
-
-    private async Task HandleColorLock(ITelegramBotClient botClient, CallbackQuery callbackQuery,
+    internal async Task HandleColorLock(ITelegramBotClient botClient, CallbackQuery callbackQuery,
         CancellationToken cancellationToken)
     {
         var message = callbackQuery.Message;
@@ -70,16 +44,6 @@ public class UpdateHandler : IUpdateHandler
             chatId, message.MessageId,
             replyMarkup: GetKeyboard(palette),
             cancellationToken: cancellationToken);
-    }
-
-    private Task HandleMessage(ITelegramBotClient botClient, Message message,
-        CancellationToken cancellationToken)
-    {
-        return message.Text switch
-        {
-            "/generate" => GenerateColorPalette(botClient, message, cancellationToken),
-            _ => Task.CompletedTask
-        };
     }
 
     private static InlineKeyboardMarkup GetKeyboard(ColorPalette palette)
@@ -103,7 +67,7 @@ public class UpdateHandler : IUpdateHandler
         return new InlineKeyboardMarkup(buttons);
     }
 
-    private async Task GenerateColorPalette(ITelegramBotClient botClient, Message message,
+    internal async Task GenerateColorPalette(ITelegramBotClient botClient, Message message,
         CancellationToken cancellationToken)
     {
         var chatId = message.Chat.Id;
@@ -124,7 +88,7 @@ public class UpdateHandler : IUpdateHandler
         await botClient.DeleteMessageAsync(chatId, message.MessageId, cancellationToken: cancellationToken);
     }
 
-    private async Task HandleRefreshCallback(ITelegramBotClient botClient, CallbackQuery callbackQuery,
+    internal async Task HandleRefreshCallback(ITelegramBotClient botClient, CallbackQuery callbackQuery,
         CancellationToken cancellationToken)
     {
         var chatId = callbackQuery.Message!.Chat.Id;

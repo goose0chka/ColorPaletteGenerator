@@ -84,6 +84,7 @@ public class UpdateHandler : IUpdateHandler
 
     private static InlineKeyboardMarkup GetKeyboard(ColorPalette palette)
     {
+        var buttons = new List<IEnumerable<InlineKeyboardButton>>();
         var keyboardButtons = palette.Colors
             .Select((color, i) =>
             {
@@ -91,11 +92,15 @@ public class UpdateHandler : IUpdateHandler
                 var data = $"lock{i}";
                 return InlineKeyboardButton.WithCallbackData(text, data);
             });
-        var updateButton = new[]
+        buttons.Add(keyboardButtons);
+
+        if (palette.Colors.All(x => x.Locked))
         {
-            InlineKeyboardButton.WithCallbackData("🔁", "refresh")
-        };
-        return new InlineKeyboardMarkup(new[] { keyboardButtons, updateButton });
+            return new InlineKeyboardMarkup(buttons);
+        }
+
+        buttons.Add(new[] { InlineKeyboardButton.WithCallbackData("🔁", "refresh") });
+        return new InlineKeyboardMarkup(buttons);
     }
 
     private async Task GenerateColorPalette(ITelegramBotClient botClient, Message message,
@@ -131,6 +136,11 @@ public class UpdateHandler : IUpdateHandler
         }
 
         var palette = _palettes[chatId];
+        if (palette.Colors.All(color => color.Locked))
+        {
+            return;
+        }
+
         _generator.Generate(palette);
 
         await using var stream = palette.GetImageStream(1000, 400);

@@ -19,7 +19,7 @@ public static class ColorPaletteSkiaExtensions
         var directory = Path.GetDirectoryName(path)
             ?? throw new ArgumentException("Directory cannot be null");
         var file = Path.GetFileName(path);
-        
+
         if (Path.GetExtension(file) != "png")
         {
             if (Path.HasExtension(file))
@@ -35,7 +35,7 @@ public static class ColorPaletteSkiaExtensions
         return Path.Combine(directory, file);
     }
 
-    public static Stream GetImageStream(this ColorPalette palette, int width, int height) 
+    public static Stream GetImageStream(this ColorPalette palette, int width, int height)
         => GetData(palette, width, height).AsStream();
 
     private static SKData GetData(ColorPalette palette, int width, int height)
@@ -59,5 +59,5 @@ public static class ColorPaletteSkiaExtensions
     }
 
     private static SKColor ToSkiaColor(this BaseColor c)
-        => new (c.Red, c.Green, c.Blue);
+        => new(c.Red, c.Green, c.Blue);
 }

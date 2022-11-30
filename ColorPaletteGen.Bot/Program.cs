@@ -1,4 +1,6 @@
 using ColorPaletteGen.Bot;
+using ColorPaletteGen.Core;
+using ColorPaletteGen.Core.GenerationStrategies;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 
@@ -10,7 +12,10 @@ var host = Host.CreateDefaultBuilder(args)
         collection
             .AddHostedService<Worker>()
             .AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(token))
-            .AddSingleton<IUpdateHandler, UpdateHandler>();
+            .AddSingleton<IUpdateHandler, UpdateHandler>()
+            .AddSingleton<IGenerationStrategy<GenerationStrategy>, RandomGenerationStrategy>()
+            .AddSingleton<IGenerationStrategy<GenerationStrategy>, AnalogousGenerationStrategy>()
+            .AddSingleton<ColorPaletteGenerator>();
     })
     .Build();
 

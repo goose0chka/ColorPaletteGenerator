@@ -12,12 +12,14 @@ namespace ColorPaletteGen.Bot;
 
 public class UpdateHandler : IUpdateHandler
 {
-    private readonly Dictionary<ChatId, ColorPalette> _palettes = new();
+    private readonly ColorPaletteGenerator _generator;
     private readonly ILogger<UpdateHandler> _logger;
+    private readonly Dictionary<ChatId, ColorPalette> _palettes = new();
 
-    public UpdateHandler(ILogger<UpdateHandler> logger)
+    public UpdateHandler(ILogger<UpdateHandler> logger, ColorPaletteGenerator generator)
     {
         _logger = logger;
+        _generator = generator;
     }
 
     public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
@@ -29,6 +31,14 @@ public class UpdateHandler : IUpdateHandler
             UpdateType.CallbackQuery => HandleCallbackQuery(botClient, update.CallbackQuery!, cancellationToken),
             _ => Task.CompletedTask
         };
+    }
+
+    public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
+        CancellationToken cancellationToken)
+    {
+        var time = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
+        _logger.LogError(exception, "{Time}: ", time);
+        return Task.CompletedTask;
     }
 
     private Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery,
@@ -98,7 +108,7 @@ public class UpdateHandler : IUpdateHandler
         }
 
         var palette = _palettes[chatId];
-        palette.Generate();
+        _generator.Generate(palette);
 
         await using var stream = palette.GetImageStream(1000, 400);
         var media = new InputOnlineFile(stream);
@@ -121,7 +131,7 @@ public class UpdateHandler : IUpdateHandler
         }
 
         var palette = _palettes[chatId];
-        palette.Generate();
+        _generator.Generate(palette);
 
         await using var stream = palette.GetImageStream(1000, 400);
         var @base = new InputMedia(stream, "palette");
@@ -131,13 +141,5 @@ public class UpdateHandler : IUpdateHandler
             chatId, messageId, media,
             replyMarkup: GetKeyboard(palette),
             cancellationToken: cancellationToken);
-    }
-    
-    public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
-        CancellationToken cancellationToken)
-    {
-        var time = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
-        _logger.LogError(exception, "{Time}: ", time);
-        return Task.CompletedTask;
     }
 }

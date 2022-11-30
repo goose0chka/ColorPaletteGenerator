@@ -8,8 +8,9 @@ public class RandomGenerationStrategy : IGenerationStrategy<GenerationStrategy>
     private static readonly byte[] ByteBuffer = new byte[3];
     public GenerationStrategy Strategy => GenerationStrategy.Random;
 
-    public void Generate(PaletteColor[] colors)
+    public void Generate(ColorPalette palette)
     {
+        var colors = palette.Colors;
         for (var i = 0; i < colors.Length; i++)
         {
             if (colors[i].Locked)

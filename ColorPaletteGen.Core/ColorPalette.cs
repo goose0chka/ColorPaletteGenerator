@@ -6,54 +6,40 @@ namespace ColorPaletteGen.Core;
 
 public class ColorPalette
 {
-    private readonly PaletteColor[] _colors;
-    private IGenerationStrategy<GenerationStrategy> _strategy;
+    public readonly PaletteColor[] Colors;
+    public readonly GenerationStrategy Strategy;
 
-    public ReadOnlyCollection<PaletteColor> Colors => Array.AsReadOnly(_colors);
-    public int ColorCount => _colors.Length;
-
-    public ColorPalette(int colorCount = 5)
-        : this(new RandomGenerationStrategy(), colorCount)
-    {
-    }
-
-    public ColorPalette(IGenerationStrategy<GenerationStrategy> strategy, int colorCount = 5)
+    public ColorPalette(int colorCount = 5, GenerationStrategy strategy = GenerationStrategy.Random)
     {
         if (colorCount is > 10 or < 2)
         {
             throw new InvalidOperationException();
         }
 
-        _colors = Enumerable.Range(0, colorCount)
+        Strategy = strategy;
+        Colors = Enumerable.Range(0, colorCount)
             .Select(_ => new PaletteColor())
             .ToArray();
-        _strategy = strategy;
     }
 
-    public void SetStrategy(IGenerationStrategy<GenerationStrategy> strategy)
-        => _strategy = strategy;
+    public int ColorCount => Colors.Length;
+
+    public BaseColor this[int index]
+        => Colors[index];
 
     public void LockColor(int index, bool locked = true)
     {
-        if (index > _colors.Length)
+        if (index > Colors.Length)
         {
             throw new ArgumentException("Color index is out of range");
         }
 
-        _colors[index].Locked = locked;
+        Colors[index].Locked = locked;
     }
 
     public void InvertLock(int index)
     {
-        var newLock = !_colors[index].Locked;
+        var newLock = !Colors[index].Locked;
         LockColor(index, newLock);
     }
-
-    public void Generate()
-    {
-        _strategy.Generate(_colors);
-    }
-
-    public BaseColor this[int index]
-        => _colors[index];
 }

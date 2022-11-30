@@ -27,6 +27,10 @@ public class AnalogousGenerationStrategy : IGenerationStrategy
         var val = _baseColor.GetValue();
         for (var i = 0; i < colors.Length; i++)
         {
+            if (colors[i].Locked)
+            {
+                continue;
+            }
             var newHue = hue + _distance * (i - sideCount);
             var color = ColorHSVExtensions.FromHSV(newHue, sat, val);
             colors[i] = new PaletteColor(color);

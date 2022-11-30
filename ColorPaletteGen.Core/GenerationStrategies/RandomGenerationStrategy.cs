@@ -10,6 +10,10 @@ public class RandomGenerationStrategy : IGenerationStrategy
     {
         for (var i = 0; i < colors.Length; i++)
         {
+            if (colors[i].Locked)
+            {
+                continue;
+            }
             colors[i] =  new PaletteColor(GetRandomColor());
         }
     }

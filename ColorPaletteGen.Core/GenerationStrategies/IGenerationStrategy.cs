@@ -1,6 +1,8 @@
-﻿namespace ColorPaletteGen.Core.GenerationStrategies;
+﻿using ColorPaletteGen.Core.Color;
+
+namespace ColorPaletteGen.Core.GenerationStrategies;
 
 public interface IGenerationStrategy
 {
-    public void Generate(Color[] colors);
+    public void Generate(PaletteColor[] colors);
 }

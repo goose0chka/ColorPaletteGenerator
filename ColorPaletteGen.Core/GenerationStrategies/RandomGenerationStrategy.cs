@@ -1,20 +1,26 @@
-﻿namespace ColorPaletteGen.Core.GenerationStrategies;
+﻿using ColorPaletteGen.Core.Color;
+
+namespace ColorPaletteGen.Core.GenerationStrategies;
 
 public class RandomGenerationStrategy : IGenerationStrategy
 {
     private static readonly Random Rand = Random.Shared;
     private static readonly byte[] ByteBuffer = new byte[3];
-    public void Generate(Color[] colors)
+    public void Generate(PaletteColor[] colors)
     {
         for (var i = 0; i < colors.Length; i++)
         {
-            colors[i] = GetRandomColor();
+            if (colors[i].Locked)
+            {
+                continue;
+            }
+            colors[i] =  new PaletteColor(GetRandomColor());
         }
     }
 
-    public static Color GetRandomColor()
+    private static BaseColor GetRandomColor()
     {
         Rand.NextBytes(ByteBuffer);
-        return Color.FromRGB(ByteBuffer);
+        return BaseColor.FromRGB(ByteBuffer);
     }
 }

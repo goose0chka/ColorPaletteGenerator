@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using ColorPaletteGen.Core.Color;
+using SkiaSharp;
 
 namespace ColorPaletteGen.Core.Extensions;
 
@@ -57,6 +58,6 @@ public static class ColorPaletteSkiaExtensions
         return bitmap.Encode(SKEncodedImageFormat.Png, 20);
     }
 
-    private static SKColor ToSkiaColor(this Color c)
+    private static SKColor ToSkiaColor(this BaseColor c)
         => new (c.Red, c.Green, c.Blue);
 }

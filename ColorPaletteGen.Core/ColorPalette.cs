@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using ColorPaletteGen.Core.Color;
+﻿using ColorPaletteGen.Core.Color;
 using ColorPaletteGen.Core.GenerationStrategies;
 
 namespace ColorPaletteGen.Core;

@@ -27,9 +27,7 @@ public class UpdateRouter : IUpdateHandler
 
     public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
         CancellationToken cancellationToken)
-    {
-        return _handler.HandlePollingErrorAsync(exception);
-    }
+        => _handler.HandlePollingErrorAsync(exception);
 
     private Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery,
         CancellationToken cancellationToken)

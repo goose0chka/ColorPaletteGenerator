@@ -42,8 +42,8 @@ public class UpdateHandler
         palette.InvertLock(colorIndex);
         await botClient.EditMessageReplyMarkupAsync(
             chatId, message.MessageId,
-            replyMarkup: GetKeyboard(palette),
-            cancellationToken: cancellationToken);
+            GetKeyboard(palette),
+            cancellationToken);
     }
 
     private static InlineKeyboardMarkup GetKeyboard(ColorPalette palette)
@@ -85,7 +85,7 @@ public class UpdateHandler
             message.Chat.Id, media,
             replyMarkup: GetKeyboard(palette),
             cancellationToken: cancellationToken);
-        await botClient.DeleteMessageAsync(chatId, message.MessageId, cancellationToken: cancellationToken);
+        await botClient.DeleteMessageAsync(chatId, message.MessageId, cancellationToken);
     }
 
     internal async Task HandleRefreshCallback(ITelegramBotClient botClient, CallbackQuery callbackQuery,
@@ -113,7 +113,7 @@ public class UpdateHandler
 
         await botClient.EditMessageMediaAsync(
             chatId, messageId, media,
-            replyMarkup: GetKeyboard(palette),
-            cancellationToken: cancellationToken);
+            GetKeyboard(palette),
+            cancellationToken);
     }
 }

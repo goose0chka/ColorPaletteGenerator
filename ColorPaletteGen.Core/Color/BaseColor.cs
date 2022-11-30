@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace ColorPaletteGen.Core.Color;
+﻿namespace ColorPaletteGen.Core.Color;
 
 public class BaseColor
 {

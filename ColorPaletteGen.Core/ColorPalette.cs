@@ -7,7 +7,7 @@ namespace ColorPaletteGen.Core;
 public class ColorPalette
 {
     private readonly PaletteColor[] _colors;
-    private IGenerationStrategy _strategy;
+    private IGenerationStrategy<GenerationStrategy> _strategy;
 
     public ReadOnlyCollection<PaletteColor> Colors => Array.AsReadOnly(_colors);
     public int ColorCount => _colors.Length;
@@ -17,7 +17,7 @@ public class ColorPalette
     {
     }
 
-    public ColorPalette(IGenerationStrategy strategy, int colorCount = 5)
+    public ColorPalette(IGenerationStrategy<GenerationStrategy> strategy, int colorCount = 5)
     {
         if (colorCount is > 10 or < 2)
         {
@@ -30,7 +30,7 @@ public class ColorPalette
         _strategy = strategy;
     }
 
-    public void SetStrategy(IGenerationStrategy strategy)
+    public void SetStrategy(IGenerationStrategy<GenerationStrategy> strategy)
         => _strategy = strategy;
 
     public void LockColor(int index, bool locked = true)

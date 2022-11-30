@@ -2,10 +2,12 @@
 
 namespace ColorPaletteGen.Core.GenerationStrategies;
 
-public class RandomGenerationStrategy : IGenerationStrategy
+public class RandomGenerationStrategy : IGenerationStrategy<GenerationStrategy>
 {
     private static readonly Random Rand = Random.Shared;
     private static readonly byte[] ByteBuffer = new byte[3];
+    public GenerationStrategy Strategy => GenerationStrategy.Random;
+
     public void Generate(PaletteColor[] colors)
     {
         for (var i = 0; i < colors.Length; i++)
@@ -14,7 +16,8 @@ public class RandomGenerationStrategy : IGenerationStrategy
             {
                 continue;
             }
-            colors[i] =  new PaletteColor(GetRandomColor());
+
+            colors[i] = new PaletteColor(GetRandomColor());
         }
     }
 

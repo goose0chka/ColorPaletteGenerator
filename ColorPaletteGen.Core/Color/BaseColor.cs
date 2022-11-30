@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace ColorPaletteGen.Core.Color;
+﻿namespace ColorPaletteGen.Core.Color;
 
 public class BaseColor
 {
@@ -25,7 +23,7 @@ public class BaseColor
         {
             throw new InvalidOperationException();
         }
-        
+
         return new BaseColor(bytes[0], bytes[1], bytes[2]);
     }
 

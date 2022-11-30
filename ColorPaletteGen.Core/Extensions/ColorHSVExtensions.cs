@@ -25,7 +25,7 @@ public static class ColorHSVExtensions
             B = Normalize(color.Blue);
         }
     }
-    
+
     public static int GetHue(this BaseColor color)
     {
         var data = new RGBToHSVData(color);
@@ -34,7 +34,7 @@ public static class ColorHSVExtensions
         {
             return 0;
         }
-        
+
         if (Math.Abs(data.Max - data.R) < Tolerance)
         {
             return (int)Math.Truncate(60 * ((data.G - data.B) / data.Diff % 6));
@@ -61,19 +61,19 @@ public static class ColorHSVExtensions
 
     public static int GetValue(this BaseColor color)
         => Convert.ToInt32(new RGBToHSVData(color).Max * 100);
-    
+
     public static BaseColor FromHSV(int hue, int saturation, int value)
     {
         var h = hue >= 0 ? hue % 360 : 360 - Math.Abs(hue % 360);
         var s = Math.Clamp(saturation, 0, 100) / 100.0;
         var v = Math.Clamp(value, 0, 100) / 100.0;
-        
+
         // HSV to RGB 
         var c = v * s;
         var x = c * (1 - Math.Abs(h / 60.0 % 2 - 1));
         var m = v - c;
         double rN = 0, gN = 0, bN = 0;
-        
+
         // TODO: Change to if's or smth
         switch (h / 60)
         {
@@ -112,7 +112,7 @@ public static class ColorHSVExtensions
         var r = Convert.ToByte(Math.Round((rN + m) * 255) % 256);
         var g = Convert.ToByte(Math.Round((gN + m) * 255) % 256);
         var b = Convert.ToByte(Math.Round((bN + m) * 255) % 256);
-        
+
         return BaseColor.FromRGB(r, g, b);
     }
 }

@@ -3,24 +3,28 @@ using ColorPaletteGen.Core.Extensions;
 
 namespace ColorPaletteGen.Core.GenerationStrategies;
 
-public class AnalogousGenerationStrategy : IGenerationStrategy
+public class AnalogousGenerationStrategy : IGenerationStrategy<GenerationStrategy>
 {
-    private readonly int _distance;
     private readonly BaseColor _baseColor;
+    private readonly int _distance;
 
-    public AnalogousGenerationStrategy(BaseColor baseColor, int distance = 15)
+    public AnalogousGenerationStrategy(int distance = 15)
     {
-        _baseColor = baseColor;
+        _baseColor = BaseColor.FromRGB(0, 0, 0);
         _distance = distance;
     }
 
-    public void Generate(PaletteColor[] colors)
+    public GenerationStrategy Strategy => GenerationStrategy.Analogous;
+
+
+    public void Generate(ColorPalette palette)
     {
+        var colors = palette.Colors;
         if (colors.Length % 2 != 1)
         {
             throw new InvalidOperationException("Analogous palette should have uneven color count");
         }
-        
+
         var sideCount = colors.Length / 2;
         var hue = _baseColor.GetHue();
         var sat = _baseColor.GetSaturation();
@@ -31,6 +35,7 @@ public class AnalogousGenerationStrategy : IGenerationStrategy
             {
                 continue;
             }
+
             var newHue = hue + _distance * (i - sideCount);
             var color = ColorHSVExtensions.FromHSV(newHue, sat, val);
             colors[i] = new PaletteColor(color);

@@ -10,7 +10,7 @@ public class Worker : BackgroundService
     {
         AllowedUpdates = new[] { UpdateType.Message, UpdateType.CallbackQuery }
     };
-    
+
     private readonly ITelegramBotClient _client;
     private readonly IUpdateHandler _handler;
 

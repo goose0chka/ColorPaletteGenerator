@@ -1,8 +1,7 @@
-﻿using ColorPaletteGen.Core.Color;
+﻿namespace ColorPaletteGen.Core.GenerationStrategies;
 
-namespace ColorPaletteGen.Core.GenerationStrategies;
-
-public interface IGenerationStrategy
+public interface IGenerationStrategy<out T> where T : Enum
 {
-    public void Generate(PaletteColor[] colors);
+    T Strategy { get; }
+    public void Generate(ColorPalette palette);
 }

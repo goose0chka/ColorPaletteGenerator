@@ -2,6 +2,7 @@ using ColorPaletteGen.Bot;
 using ColorPaletteGen.Bot.Handlers;
 using ColorPaletteGen.Core;
 using ColorPaletteGen.Core.GenerationStrategies;
+using ColorPaletteGen.DAL.Context;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 
@@ -17,7 +18,8 @@ var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<IUpdateHandler, UpdateRouter>()
             .AddSingleton<IGenerationStrategy<GenerationStrategy>, RandomGenerationStrategy>()
             .AddSingleton<IGenerationStrategy<GenerationStrategy>, AnalogousGenerationStrategy>()
-            .AddSingleton<ColorPaletteGenerator>();
+            .AddSingleton<ColorPaletteGenerator>()
+            .AddDbContext<DataContext>();
     })
     .Build();
 

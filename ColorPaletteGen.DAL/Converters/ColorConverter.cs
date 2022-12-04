@@ -30,16 +30,16 @@ public class ColorConverter : ValueConverter<IList<Color>, string>
 
     private static IList<Color> RestoreColorsFromString(string s)
     {
-        var strings = s.Split(';');
+        var strings = s.Split(';', StringSplitOptions.RemoveEmptyEntries);
         var res = new Color[strings.Length];
         for (var i = 0; i < strings.Length; i++)
         {
             var str = strings[i];
             res[i] = new Color
             {
-                Red = byte.Parse(str[..2]),
-                Green = byte.Parse(str[2..4]),
-                Blue = byte.Parse(str[4..6]),
+                Red = Convert.ToByte(str[..2], 16),
+                Green = Convert.ToByte(str[2..4], 16),
+                Blue = Convert.ToByte(str[4..6], 16),
                 Locked = str[^1] == 'L'
             };
         }

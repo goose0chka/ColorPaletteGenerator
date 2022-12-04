@@ -1,4 +1,5 @@
 ﻿using ColorPaletteGen.Core.GenerationStrategies;
+using ColorPaletteGen.DAL.Model;
 
 namespace ColorPaletteGen.Core;
 
@@ -13,7 +14,7 @@ public class ColorPaletteGenerator
 
     public void Generate(ColorPalette palette)
     {
-        var strategy = _strategies.First(x => x.Strategy == palette.Strategy);
+        var strategy = _strategies.First(x => x.Strategy == palette.GenerationStrategy);
         strategy.Generate(palette);
     }
 }

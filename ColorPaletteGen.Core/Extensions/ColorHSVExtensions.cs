@@ -1,4 +1,4 @@
-﻿using ColorPaletteGen.Core.Color;
+﻿using ColorPaletteGen.DAL.Model;
 
 namespace ColorPaletteGen.Core.Extensions;
 
@@ -18,7 +18,7 @@ public static class ColorHSVExtensions
         public double Min => Math.Min(R, Math.Min(G, B));
         public double Diff => Max - Min;
 
-        public RGBToHSVData(BaseColor color)
+        public RGBToHSVData(Color color)
         {
             R = Normalize(color.Red);
             G = Normalize(color.Green);
@@ -26,7 +26,7 @@ public static class ColorHSVExtensions
         }
     }
 
-    public static int GetHue(this BaseColor color)
+    public static int GetHue(this Color color)
     {
         var data = new RGBToHSVData(color);
 
@@ -53,16 +53,16 @@ public static class ColorHSVExtensions
         throw new Exception();
     }
 
-    public static int GetSaturation(this BaseColor color)
+    public static int GetSaturation(this Color color)
     {
         var data = new RGBToHSVData(color);
         return data.Max == 0 ? 0 : Convert.ToInt32(data.Max / data.Diff * 100);
     }
 
-    public static int GetValue(this BaseColor color)
+    public static int GetValue(this Color color)
         => Convert.ToInt32(new RGBToHSVData(color).Max * 100);
 
-    public static BaseColor FromHSV(int hue, int saturation, int value)
+    public static Color FromHSV(int hue, int saturation, int value)
     {
         var h = hue >= 0 ? hue % 360 : 360 - Math.Abs(hue % 360);
         var s = Math.Clamp(saturation, 0, 100) / 100.0;
@@ -113,6 +113,6 @@ public static class ColorHSVExtensions
         var g = Convert.ToByte(Math.Round((gN + m) * 255) % 256);
         var b = Convert.ToByte(Math.Round((bN + m) * 255) % 256);
 
-        return BaseColor.FromRGB(r, g, b);
+        return new Color(r, g, b);
     }
 }

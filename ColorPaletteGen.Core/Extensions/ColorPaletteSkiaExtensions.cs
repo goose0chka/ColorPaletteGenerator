@@ -1,4 +1,4 @@
-﻿using ColorPaletteGen.Core.Color;
+﻿using ColorPaletteGen.DAL.Model;
 using SkiaSharp;
 
 namespace ColorPaletteGen.Core.Extensions;
@@ -43,13 +43,13 @@ public static class ColorPaletteSkiaExtensions
         using SKBitmap bitmap = new(width, height);
         using SKCanvas canvas = new(bitmap);
 
-        var widthPerColor = width / palette.ColorCount;
-        for (var i = 0; i < palette.ColorCount; i++)
+        var widthPerColor = width / palette.Count;
+        for (var i = 0; i < palette.Count; i++)
         {
             var x = widthPerColor * i;
             SKPaint pen = new()
             {
-                Color = palette[i].ToSkiaColor(),
+                Color = palette.Colors[i].ToSkiaColor(),
                 Style = SKPaintStyle.Fill
             };
             canvas.DrawRect(x, 0, widthPerColor, height, pen);
@@ -58,6 +58,6 @@ public static class ColorPaletteSkiaExtensions
         return bitmap.Encode(SKEncodedImageFormat.Png, 20);
     }
 
-    private static SKColor ToSkiaColor(this BaseColor c)
+    private static SKColor ToSkiaColor(this Color c)
         => new(c.Red, c.Green, c.Blue);
 }

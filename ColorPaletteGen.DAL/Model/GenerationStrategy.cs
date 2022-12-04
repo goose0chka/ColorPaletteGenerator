@@ -1,4 +1,4 @@
-﻿namespace ColorPaletteGen.Core.GenerationStrategies;
+﻿namespace ColorPaletteGen.DAL.Model;
 
 public enum GenerationStrategy
 {

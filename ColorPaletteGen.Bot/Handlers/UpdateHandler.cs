@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using ColorPaletteGen.Core;
 using ColorPaletteGen.Core.Extensions;
+using ColorPaletteGen.DAL.Context;
+using ColorPaletteGen.DAL.Model;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
@@ -12,12 +14,19 @@ public class UpdateHandler
 {
     private readonly ColorPaletteGenerator _generator;
     private readonly ILogger<UpdateHandler> _logger;
-    private readonly Dictionary<ChatId, ColorPalette> _palettes = new();
+    private readonly IServiceProvider _provider;
 
-    public UpdateHandler(ILogger<UpdateHandler> logger, ColorPaletteGenerator generator)
+    private AsyncServiceScope GetScope()
+        => _provider.CreateAsyncScope();
+
+    private static DataContext GetContext(AsyncServiceScope scope)
+        => scope.ServiceProvider.GetService<DataContext>()!;
+
+    public UpdateHandler(ILogger<UpdateHandler> logger, ColorPaletteGenerator generator, IServiceProvider provider)
     {
         _logger = logger;
         _generator = generator;
+        _provider = provider;
     }
 
     public Task HandlePollingErrorAsync(Exception exception)
@@ -30,9 +39,15 @@ public class UpdateHandler
     internal async Task HandleColorLock(ITelegramBotClient botClient, CallbackQuery callbackQuery,
         CancellationToken cancellationToken)
     {
-        var message = callbackQuery.Message;
-        var chatId = message!.Chat.Id;
-        if (!_palettes.TryGetValue(chatId, out var palette))
+        var message = callbackQuery.Message!;
+        var chatId = message.Chat.Id;
+        var messageId = message.MessageId;
+
+        await using var scope = GetScope();
+        await using var context = GetContext(scope);
+        var palette = await context.Palettes.FindAsync(new object[] { chatId, messageId },
+            cancellationToken: cancellationToken);
+        if (palette is null)
         {
             return;
         }
@@ -40,8 +55,12 @@ public class UpdateHandler
         var colorIndexStr = new string(callbackQuery.Data!.Skip(4).ToArray());
         var colorIndex = int.Parse(colorIndexStr);
         palette.InvertLock(colorIndex);
+
+        context.Update(palette);
+        await context.SaveChangesAsync(cancellationToken);
+
         await botClient.EditMessageReplyMarkupAsync(
-            chatId, message.MessageId,
+            chatId, messageId,
             GetKeyboard(palette),
             cancellationToken);
     }
@@ -71,21 +90,26 @@ public class UpdateHandler
         CancellationToken cancellationToken)
     {
         var chatId = message.Chat.Id;
-        if (!_palettes.ContainsKey(chatId))
+        var palette = new ColorPalette
         {
-            _palettes[chatId] = new ColorPalette();
-        }
-
-        var palette = _palettes[chatId];
+            ChatId = chatId
+        };
         _generator.Generate(palette);
 
         await using var stream = palette.GetImageStream(1000, 400);
         var media = new InputOnlineFile(stream);
-        await botClient.SendPhotoAsync(
+        var sentMessage = await botClient.SendPhotoAsync(
             message.Chat.Id, media,
             replyMarkup: GetKeyboard(palette),
             cancellationToken: cancellationToken);
         await botClient.DeleteMessageAsync(chatId, message.MessageId, cancellationToken);
+
+        palette.Id = sentMessage.MessageId;
+
+        await using var scope = _provider.CreateAsyncScope();
+        await using var dataContext = scope.ServiceProvider.GetService<DataContext>()!;
+        dataContext.Palettes.Add(palette);
+        await dataContext.SaveChangesAsync(cancellationToken);
     }
 
     internal async Task HandleRefreshCallback(ITelegramBotClient botClient, CallbackQuery callbackQuery,
@@ -93,19 +117,18 @@ public class UpdateHandler
     {
         var chatId = callbackQuery.Message!.Chat.Id;
         var messageId = callbackQuery.Message.MessageId;
-
-        if (!_palettes.ContainsKey(chatId))
-        {
-            _palettes[chatId] = new ColorPalette();
-        }
-
-        var palette = _palettes[chatId];
-        if (palette.Colors.All(color => color.Locked))
+        
+        await using var scope = GetScope();
+        await using var context = GetContext(scope);
+        var palette = await context.Palettes.FindAsync(new object[] { chatId, messageId }, cancellationToken);
+        if (palette is null || palette.Colors.All(color => color.Locked))
         {
             return;
         }
 
         _generator.Generate(palette);
+        context.Palettes.Update(palette);
+        await context.SaveChangesAsync(cancellationToken);
 
         await using var stream = palette.GetImageStream(1000, 400);
         var @base = new InputMedia(stream, "palette");

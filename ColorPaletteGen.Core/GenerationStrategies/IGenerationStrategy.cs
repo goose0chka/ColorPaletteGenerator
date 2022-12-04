@@ -1,4 +1,6 @@
-﻿namespace ColorPaletteGen.Core.GenerationStrategies;
+﻿using ColorPaletteGen.DAL.Model;
+
+namespace ColorPaletteGen.Core.GenerationStrategies;
 
 public interface IGenerationStrategy<out T> where T : Enum
 {

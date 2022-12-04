@@ -1,4 +1,5 @@
-﻿using ColorPaletteGen.Core.Color;
+﻿using ColorPaletteGen.Core.Extensions;
+using ColorPaletteGen.DAL.Model;
 
 namespace ColorPaletteGen.Core.GenerationStrategies;
 
@@ -11,20 +12,20 @@ public class RandomGenerationStrategy : IGenerationStrategy<GenerationStrategy>
     public void Generate(ColorPalette palette)
     {
         var colors = palette.Colors;
-        for (var i = 0; i < colors.Length; i++)
+        for (var i = 0; i < colors.Count; i++)
         {
             if (colors[i].Locked)
             {
                 continue;
             }
-
-            colors[i] = new PaletteColor(GetRandomColor());
+    
+            colors[i] = GetRandomColor();
         }
     }
 
-    private static BaseColor GetRandomColor()
+    private static Color GetRandomColor()
     {
         Rand.NextBytes(ByteBuffer);
-        return BaseColor.FromRGB(ByteBuffer);
+        return ColorExtensions.FromByteArray(ByteBuffer);
     }
 }

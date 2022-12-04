@@ -1,4 +1,5 @@
-﻿using ColorPaletteGen.DAL.Model;
+﻿using ColorPaletteGen.DAL.Comparers;
+using ColorPaletteGen.DAL.Model;
 using Microsoft.EntityFrameworkCore;
 using ColorPaletteGen.DAL.Converters;
 
@@ -19,7 +20,7 @@ public class DataContext : DbContext
             .HasKey(palette => new { palette.ChatId, palette.Id });
         paletteEntity
             .Property(palette => palette.Colors)
-            .HasConversion<ColorConverter>();
-        
+            .HasConversion<ColorConverter, ColorComparer>();
+
     }
 }

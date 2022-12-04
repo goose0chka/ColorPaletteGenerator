@@ -21,4 +21,7 @@ public class Color
 
     public override string ToString()
         => $"#{Red:X2}{Green:X2}{Blue:X2}";
+
+    public bool Equals(Color other)
+        => Red == other.Red && Green == other.Green && Blue == other.Blue && Locked == other.Locked;
 }

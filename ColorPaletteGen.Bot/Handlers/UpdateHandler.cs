@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using ColorPaletteGen.Core;
 using ColorPaletteGen.Core.Extensions;
+using ColorPaletteGen.DAL.Model;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;

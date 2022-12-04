@@ -2,7 +2,7 @@
 
 public class ColorPalette
 {
-    public long Id { get; set; }
+    public int Id { get; set; }
     public long ChatId { get; set; }
     public IList<Color> Colors { get; set; }
     public GenerationStrategy GenerationStrategy { get; set; }

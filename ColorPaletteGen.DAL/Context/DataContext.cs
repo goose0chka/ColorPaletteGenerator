@@ -13,9 +13,13 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .Entity<ColorPalette>()
+        var paletteEntity = modelBuilder
+            .Entity<ColorPalette>();
+        paletteEntity
+            .HasKey(palette => new { palette.ChatId, palette.Id });
+        paletteEntity
             .Property(palette => palette.Colors)
             .HasConversion<ColorConverter>();
+        
     }
 }

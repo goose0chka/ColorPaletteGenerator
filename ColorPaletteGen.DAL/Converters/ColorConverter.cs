@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ColorPaletteGen.DAL.Converters;
 
-public class ColorConverter : ValueConverter<IEnumerable<Color>, string>
+public class ColorConverter : ValueConverter<IList<Color>, string>
 {
     public ColorConverter()
         : base(
@@ -28,7 +28,7 @@ public class ColorConverter : ValueConverter<IEnumerable<Color>, string>
         return builder.ToString();
     }
 
-    private static IEnumerable<Color> RestoreColorsFromString(string s)
+    private static IList<Color> RestoreColorsFromString(string s)
     {
         var strings = s.Split(';');
         var res = new Color[strings.Length];

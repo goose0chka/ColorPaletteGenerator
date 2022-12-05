@@ -8,7 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace ColorPaletteGen.Bot.Handlers;
+namespace ColorPaletteGen.BotWorker.Handlers;
 
 public class UpdateHandler
 {

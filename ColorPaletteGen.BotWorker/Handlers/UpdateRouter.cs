@@ -3,7 +3,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace ColorPaletteGen.Bot.Handlers;
+namespace ColorPaletteGen.BotWorker.Handlers;
 
 public class UpdateRouter : IUpdateHandler
 {

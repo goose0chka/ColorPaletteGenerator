@@ -2,7 +2,7 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 
-namespace ColorPaletteGen.Bot;
+namespace ColorPaletteGen.BotWorker;
 
 public class Worker : BackgroundService
 {

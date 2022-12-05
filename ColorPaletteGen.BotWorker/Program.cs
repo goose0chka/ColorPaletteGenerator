@@ -1,5 +1,5 @@
-using ColorPaletteGen.Bot;
-using ColorPaletteGen.Bot.Handlers;
+using ColorPaletteGen.BotWorker;
+using ColorPaletteGen.BotWorker.Handlers;
 using ColorPaletteGen.Core;
 using ColorPaletteGen.Core.GenerationStrategies;
 using ColorPaletteGen.DAL.Context;

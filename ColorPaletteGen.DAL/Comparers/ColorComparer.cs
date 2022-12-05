@@ -8,12 +8,11 @@ public class ColorComparer : ValueComparer<IList<Color>>
     public ColorComparer() 
         : base(
             (list1, list2) => CompareColors(list1, list2),
-            list => GetHash(list)) { }
+            list => 0,
+            list => GetSnapshot(list)) { }
 
-    private static int GetHash(IList<Color> list)
-    {
-        throw new NotImplementedException();
-    }
+    private static IList<Color> GetSnapshot(IList<Color> list)
+        => list.Select(color => new Color(color)).ToList();
 
     private static bool CompareColors(IList<Color>? list1, IList<Color>? list2)
     {

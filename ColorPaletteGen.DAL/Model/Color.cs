@@ -11,8 +11,14 @@ public class Color
         Blue = blue;
     }
 
-    public Color() 
+    public Color()
         : this(0, 0, 0) { }
+
+    public Color(Color other)
+        : this(other.Red, other.Green, other.Blue)
+    {
+        Locked = other.Locked;
+    }
 
     public byte Red { get; set; }
     public byte Green { get; set; }

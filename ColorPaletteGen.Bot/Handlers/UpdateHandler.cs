@@ -29,6 +29,9 @@ public class UpdateHandler
         _provider = provider;
     }
 
+    private static (long, int) GetId(Message message)
+        => (message.Chat.Id, message.MessageId);
+
     public Task HandlePollingErrorAsync(Exception exception)
     {
         var time = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
@@ -39,10 +42,8 @@ public class UpdateHandler
     internal async Task HandleColorLock(ITelegramBotClient botClient, CallbackQuery callbackQuery,
         CancellationToken cancellationToken)
     {
-        var message = callbackQuery.Message!;
-        var chatId = message.Chat.Id;
-        var messageId = message.MessageId;
-
+        var (chatId, messageId) = GetId(callbackQuery.Message!);
+        
         await using var scope = GetScope();
         await using var context = GetContext(scope);
         var palette = await context.Palettes.FindAsync(new object[] { chatId, messageId },
@@ -55,10 +56,8 @@ public class UpdateHandler
         var colorIndexStr = new string(callbackQuery.Data!.Skip(4).ToArray());
         var colorIndex = int.Parse(colorIndexStr);
         palette.InvertLock(colorIndex);
-
-        context.Update(palette);
+        
         await context.SaveChangesAsync(cancellationToken);
-
         await botClient.EditMessageReplyMarkupAsync(
             chatId, messageId,
             GetKeyboard(palette),
@@ -99,7 +98,7 @@ public class UpdateHandler
         await using var stream = palette.GetImageStream(1000, 400);
         var media = new InputOnlineFile(stream);
         var sentMessage = await botClient.SendPhotoAsync(
-            message.Chat.Id, media,
+            chatId, media,
             replyMarkup: GetKeyboard(palette),
             cancellationToken: cancellationToken);
         await botClient.DeleteMessageAsync(chatId, message.MessageId, cancellationToken);
@@ -115,9 +114,8 @@ public class UpdateHandler
     internal async Task HandleRefreshCallback(ITelegramBotClient botClient, CallbackQuery callbackQuery,
         CancellationToken cancellationToken)
     {
-        var chatId = callbackQuery.Message!.Chat.Id;
-        var messageId = callbackQuery.Message.MessageId;
-        
+        var (chatId, messageId) = GetId(callbackQuery.Message!);
+
         await using var scope = GetScope();
         await using var context = GetContext(scope);
         var palette = await context.Palettes.FindAsync(new object[] { chatId, messageId }, cancellationToken);
@@ -127,7 +125,6 @@ public class UpdateHandler
         }
 
         _generator.Generate(palette);
-        context.Palettes.Update(palette);
         await context.SaveChangesAsync(cancellationToken);
 
         await using var stream = palette.GetImageStream(1000, 400);

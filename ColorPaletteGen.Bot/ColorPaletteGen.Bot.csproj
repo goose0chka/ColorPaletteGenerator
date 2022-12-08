@@ -9,10 +9,12 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="Telegram.Bot" Version="18.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
+      <ProjectReference Include="..\ColorPaletteGen.Core\ColorPaletteGen.Core.csproj" />
+      <ProjectReference Include="..\ColorPaletteGen.DAL\ColorPaletteGen.DAL.csproj" />
     </ItemGroup>
 
 </Project>

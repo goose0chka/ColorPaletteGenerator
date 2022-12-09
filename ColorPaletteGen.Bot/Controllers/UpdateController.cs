@@ -4,6 +4,8 @@ using Telegram.Bot.Types;
 
 namespace ColorPaletteGen.Bot.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class UpdateController : ControllerBase
 {
     [HttpPost]

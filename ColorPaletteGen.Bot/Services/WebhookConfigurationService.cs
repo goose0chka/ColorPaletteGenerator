@@ -21,7 +21,7 @@ public class WebhookConfigurationService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         
-        var url = $"{_config.Host}{_config.Endpoint}";
+        var url = $"{_config.Host}/{_config.Endpoint}";
         _logger.LogInformation("Setting webhook: {Url}", url);
         await _bot.SetWebhookAsync(url, cancellationToken: cancellationToken);
     }
